@@ -23,8 +23,8 @@ export const handleRequest = async (msg) => {
     console.log("err", err);
   });
 
-  if(command!=="/start"){
-    sendCommand(chatId)
+  if (command !== "/start") {
+    sendCommand(chatId);
   }
   if (command === "/start") {
     bot.sendSticker(
@@ -164,7 +164,10 @@ function sendLs(chatId) {
 function sendCommand(chatId) {
   const options = {
     reply_markup: {
-      keyboard: [["/ping"], ["/ls"], ["/rm"]],
+      keyboard: [
+        ["/start", "/ping"],
+        ["/ls", "/rm"],
+      ],
     },
   };
   bot.sendMessage(chatId, "commands:", options);
