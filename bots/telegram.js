@@ -164,10 +164,7 @@ function sendLs(chatId) {
 function sendCommand(chatId) {
   const options = {
     reply_markup: {
-      keyboard: [
-        ["/start", "/ping"],
-        ["/ls", "/rm"],
-      ],
+      keyboard: [["/ping", "/ls", "/rm"]],
     },
   };
   bot.sendMessage(chatId, "commands:", options);
