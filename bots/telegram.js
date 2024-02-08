@@ -23,6 +23,9 @@ export const handleRequest = async (msg) => {
     console.log("err", err);
   });
 
+  if(command!=="/start"){
+    sendCommand(chatId)
+  }
   if (command === "/start") {
     bot.sendSticker(
       chatId,
@@ -49,7 +52,7 @@ export const handleRequest = async (msg) => {
     pingResFlag.set(chatId, true);
     // Listen for the user's response
   } else if (GENRE.flat().includes(msg.text)) {
-    bot.sendMessage(chatId, "Cool you are interested In " + msg.text)
+    bot.sendMessage(chatId, "Cool you are interested In " + msg.text);
     let filterGenre;
     if (msg.text === "All Events") {
       filterGenre = envEvent.events;
@@ -97,7 +100,7 @@ export const handleRequest = async (msg) => {
             const caption = `<a href="${event.href}">${event.ariaLabel}</a>
             <strong style="color:#4aff4a">₹ ${price}</strong>          
                       `;
-            bot.sendPhoto(chatId, event.src, {caption,parse_mode:"HTML"});
+            bot.sendPhoto(chatId, event.src, { caption, parse_mode: "HTML" });
           });
         });
       }
@@ -158,3 +161,11 @@ function sendLs(chatId) {
 }
 
 // Listen for the /ping command
+function sendCommand(chatId) {
+  const options = {
+    reply_markup: {
+      keyboard: [["/ping", "/ls", "rm"]],
+    },
+  };
+  bot.sendMessage(chatId, "commands:", options);
+}
