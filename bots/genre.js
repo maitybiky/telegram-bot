@@ -3,9 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 export var GENRE = [
-  ["All Events", "Music (34)"],
 
-  ["Art (3)", "Experiences (3)"],
 ];
 
 export const updateGenre = async () => {

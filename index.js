@@ -30,41 +30,37 @@ cron.schedule(
   }
 );
 async function init() {
-  console.log("getting events");
+  try {
+    let data = await upcomingEvents();
 
-  let data = await upcomingEvents();
+    envEvent.refreashEvent(data);
 
-  envEvent.refreashEvent(data);
+    let userQeue = await User.getAll();
+    userQeue.forEach(([rkey, value]) => {
+      let key = rkey.replace("db:", "");
+      value.forEach((eveName) => {
+        let userQeue = checkEvent(eveName);
 
-  console.log("got it");
-  console.log("updating genre");
-
-  console.log("genre updated");
-  console.log("broadcasting");
-  console.log("User", User.choicesMap);
-  User.choicesMap.forEach((value, key) => {
-    value.forEach((eveName) => {
-      let userQeue = checkEvent(eveName);
-      console.log("userQueue", userQeue);
-      if (userQeue.length !== 0) {
-        userQeue.forEach(({ item: event }) => {
-          if (!event.suggetion) {
-            const price = getPrice(event.ariaLabel);
-            const caption = `<a href="${event.href}">${event.ariaLabel}</a>
-<strong style="color:#4aff4a">₹ ${price}</strong>          
+        if (userQeue.length !== 0) {
+          userQeue.forEach(({ item: event }) => {
+            if (!event.suggetion) {
+              const price = getPrice(event.ariaLabel);
+              const caption = `<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
           `;
-            // console.log("caption", caption);
-            bot.sendPhoto(key, event.src, { caption, parse_mode: "HTML" });
-            User.removeGenre(key, eveName);
-          }
-        });
-        console.log('U', User.choicesMap)
-      }
+              // console.log("caption", caption);
+              bot.sendPhoto(key, event.src, { caption, parse_mode: "HTML" });
+              User.removeGenre(key, eveName);
+            }
+          });
+        }
+      });
     });
-  });
-  console.log("User@", User.choicesMap);
 
-  await updateGenre();
+    await updateGenre();
+  } catch (error) {
+    console.log("error", error);
+  }
 }
 init();
+
 console.log("Bot is running...");

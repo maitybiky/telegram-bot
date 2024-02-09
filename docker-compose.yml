@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  node:
+    build:
+      context: .
+      dockerfile: dockerfile
+    volumes:
+      - ./db:/db
+    depends_on:
+      - redis
+    environment:
+      - REDIS_PORT = 6397
+  redis:
+    image: redis:latest
+    volumes:
+      - ./db/dump.rdb:/data/dump.rdb
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
