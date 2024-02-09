@@ -15,9 +15,9 @@ ENV PUPPETEER*SKIP_CHROMIUM_DOWNLOAD=true \
 
 WORKDIR /home/app
 
-RUN npm install
-
 COPY package.json package-lock.json\* ./
+
+RUN npm install
 
 COPY . .
 
