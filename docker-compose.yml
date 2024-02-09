@@ -11,11 +11,11 @@ services:
       - redis
     environment:
       - REDIS_PORT=6379
-      - REDIS_HOST=172-31-3-113
+      - REDIS_HOST=localhost
   redis:
     image: redis:latest
     volumes:
       - ./db/dump.rdb:/data/dump.rdb
     command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "172.31.3.113:6379:6379"
+      - "6379:6379"
