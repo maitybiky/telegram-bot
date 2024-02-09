@@ -7,11 +7,18 @@ services:
       dockerfile: dockerfile
     depends_on:
       - redis
-  
+     
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+    networks:
+      - redisnet  
 
   redis:
     image: redis:latest
-    
+    networks:
+      - redisnet
     ports:
       - "6379:6379"
 

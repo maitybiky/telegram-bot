@@ -1,4 +1,8 @@
 import redis from "redis";
+const redisConfig = {
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+};
 
 class UserChoices {
   constructor() {
@@ -6,7 +10,7 @@ class UserChoices {
   }
   async initialize() {
     try {
-      this.db = redis.createClient();
+      this.db = redis.createClient(redisConfig);
       await this.db.connect();
       this.db.on("error", (err) => console.log("db Client Error", err));
     } catch (error) {
@@ -89,7 +93,7 @@ class pingFag {
     this.init();
   }
   async init() {
-    this.pingClient = redis.createClient();
+    this.pingClient = redis.createClient(redisConfig);
     await this.pingClient.connect();
     this.pingClient.on("error", (err) =>
       console.log("ping flag Client Error", err)
