@@ -11,6 +11,7 @@ services:
       - redis
     environment:
       - REDIS_PORT = 6397
+      - REDIS_HOST = 172-31-3-113
   redis:
     image: redis:latest
     volumes:
