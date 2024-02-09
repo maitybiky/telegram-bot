@@ -178,4 +178,6 @@ function sendCommand(chatId) {
       ],
     },
   };
+ 
+    bot.sendMessage(chatId, ":", options);
 }
