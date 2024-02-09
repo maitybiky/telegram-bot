@@ -2,7 +2,8 @@ import { bot, getPrice } from "../index.js";
 import { checkEvent } from "./Fuzzy.js";
 import { User, envEvent } from "./db.js";
 import { GENRE } from "./genre.js";
-let pingResFlag = new Map();
+const pingResFlag = new Map();
+const didYmeanFlag = new Map();
 
 export const handleRequest = async (msg) => {
   console.log("chatId", msg.chat.id, msg.text);
@@ -26,7 +27,6 @@ export const handleRequest = async (msg) => {
   if (!msg.text) {
     return;
   }
-
 
   bot.on("polling_error", (err) => {
     console.log("err", err);
@@ -53,13 +53,19 @@ export const handleRequest = async (msg) => {
       "Available commands:\n/start - Start the bot\n/ping - Notified on event opening\n/upcoming - get upcomming events\n/now - currently available events"
     );
   } else if (command === "/now") {
-    const options = {
-      reply_markup: {
-        keyboard: GENRE,
-      },
-    };
-    bot.sendMessage(chatId, "Event List:", options);
-    bot.sendMessage(chatId, "Tap Your favourite Genre");
+   
+    if(GENRE.length>0){
+      const options = {
+        reply_markup: {
+          keyboard: GENRE,
+        },
+      };
+      bot.sendMessage(chatId, "Event List:", options)
+      bot.sendMessage(chatId, "Tap Your favourite Genre");
+    }else{
+      bot.sendMessage(chatId, "Not Found !!! try again later...");
+;
+    }
   } else if (command === "/ping") {
     bot
       .sendMessage(chatId, "Enter your Artist Name or Event name :")
@@ -93,6 +99,27 @@ export const handleRequest = async (msg) => {
     sendDeleteList(chatId);
   } else if (command === "/ls") {
     sendLs(chatId);
+  } else if (command === "yes" || command === "no") {
+    const event = didYmeanFlag.get(chatId);
+    if (event && command === "no") {
+      bot.sendMessage(
+        chatId,
+        ` You will be notified  for ${event.query}.
+(Hopefully 🫣🫠🫠)`
+      );
+
+      User.addGenre(chatId,event.query);
+      bot.sendMessage(chatId, ` ${event.query} saved ✅✅✅`);
+    }
+
+    if (command === "yes" && event) {
+      let price = getPrice(event.event.ariaLabel);
+      const caption = `<a href="${event.event.href}">${event.event.ariaLabel}</a>
+    <strong style="color:#4aff4a">₹ ${price}</strong>          
+              `;
+      bot.sendPhoto(chatId, event.event.src, { caption, parse_mode: "HTML" });
+      didYmeanFlag.delete(chatId);
+    }
   } else {
     if (pingResFlag.has(chatId) && pingResFlag.get(chatId)) {
       const userResponse = msg.text;
@@ -113,11 +140,22 @@ export const handleRequest = async (msg) => {
       } else {
         bot.sendMessage(chatId, `🎉🎉🎉 Check this`).then(() => {
           search.forEach(({ item: event }) => {
-            let price = getPrice(event.ariaLabel);
-            const caption = `<a href="${event.href}">${event.ariaLabel}</a>
+            if (event.suggetion) {
+              console.log("event", event);
+              didYmeanFlag.set(chatId, event.event);
+              bot.sendMessage(chatId, `Did you mean ${event.value} ?`, {
+                reply_markup: {
+                  keyboard: [[{ text: "Yes" }], [{ text: "No" }]],
+                  one_time_keyboard: true, // Hide the custom keyboard after user selects an option
+                },
+              });
+            } else {
+              let price = getPrice(event.ariaLabel);
+              const caption = `<a href="${event.href}">${event.ariaLabel}</a>
             <strong style="color:#4aff4a">₹ ${price}</strong>          
                       `;
-            bot.sendPhoto(chatId, event.src, { caption, parse_mode: "HTML" });
+              bot.sendPhoto(chatId, event.src, { caption, parse_mode: "HTML" });
+            }
           });
         });
       }
@@ -187,5 +225,5 @@ function sendCommand(chatId) {
     },
   };
 
-  bot.sendMessage(chatId, ":", options);
+  bot.sendMessage(chatId, "", options);
 }

@@ -1,5 +1,3 @@
-
-
 class UserChoices {
   constructor() {
     this.choicesMap = new Map();
@@ -14,12 +12,10 @@ class UserChoices {
   }
   removeGenre(userId, choiceToRemove) {
     let userChoices = this.choicesMap.get(userId);
-
     if (userChoices) {
       const index = userChoices.indexOf(choiceToRemove);
       if (index !== -1) {
         userChoices.splice(index, 1);
-
         this.choicesMap.set(userId, userChoices);
       }
     }
