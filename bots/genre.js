@@ -4,25 +4,8 @@ import dotenv from "dotenv";
 dotenv.config();
 export var GENRE = [
   ["All Events", "Music (34)"],
-  ["Food and Drink (7)", "Comedy (6)"],
-  ["Kabaddi (6)", "Self Improvement (4)"],
+
   ["Art (3)", "Experiences (3)"],
-  ["Theatre (3)", "Conference (2)"],
-  ["Date Meet (2)", "Food and Music Festival (2)"],
-  ["Holi Party (2)", "Live Event (2)"],
-  ["Runathon (2)", "Adventure (1)"],
-  ["Brunch (1)", "Courses (1)"],
-  ["Dance (1)", "Dance and Music (1)"],
-  ["Dinner (1)", "Drama (1)"],
-  ["Events & Workshops (1)", "Food (1)"],
-  ["Food Fest (1)", "Free Events (1)"],
-  ["Gaming and Entertainment (1)", "Literature (1)"],
-  ["Marathon (1)", "NY Parties 2024 (1)"],
-  ["Other (1)", "Parties (1)"],
-  ["Pocket Friendly (1)", "Run (1)"],
-  ["Skill Development (1)", "Storytelling (1)"],
-  ["Table Tennis (1)", "Workshops (1)"],
-  ["Yoga (1)"],
 ];
 
 export const updateGenre = async () => {
@@ -30,7 +13,7 @@ export const updateGenre = async () => {
     try {
       const browser = await Puppeteer.launch({
         headless: "new",
-        executablePath:process.env.PUPPETEER_EXECUTABLE_PATH,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
         args: [
           "--no-sandbox",
           "--disable-setuid-sandbox",

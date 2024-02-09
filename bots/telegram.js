@@ -41,8 +41,16 @@ export const handleRequest = async (msg) => {
   } else if (command === "/help") {
     bot.sendMessage(
       chatId,
-      "Available commands:\n/start - Start the bot\n/ping - Notified on event opening\n/upcoming - get upcomming events"
+      "Available commands:\n/start - Start the bot\n/ping - Notified on event opening\n/upcoming - get upcomming events\n/now - currently available events"
     );
+  } else if (command === "/now") {
+    const options = {
+      reply_markup: {
+        keyboard: GENRE,
+      },
+    };
+    bot.sendMessage(chatId, "Event List:", options);
+    bot.sendMessage(chatId, "Tap Your favourite Genre");
   } else if (command === "/ping") {
     bot
       .sendMessage(chatId, "Enter your Artist Name or Event name :")
@@ -160,12 +168,14 @@ function sendLs(chatId) {
     .catch((error) => console.error("Error sending list:", error));
 }
 
-// Listen for the /ping command
+
 function sendCommand(chatId) {
   const options = {
     reply_markup: {
-      keyboard: [["/ping", "/ls", "/rm"]],
+      keyboard: [
+        ["/ping", "/ls"],
+        ["/rm", "/now"],
+      ],
     },
   };
-  bot.sendMessage(chatId, "commands:", options);
 }
