@@ -5,15 +5,13 @@ services:
     build:
       context: .
       dockerfile: dockerfile
-      
     depends_on:
       - redis
-    environment:
-      - REDIS_PORT=6379
-      - REDIS_HOST=localhost
+  
+
   redis:
     image: redis:latest
-
-    command: ["redis-server", "--appendonly", "yes"]
+    
     ports:
       - "6379:6379"
+
