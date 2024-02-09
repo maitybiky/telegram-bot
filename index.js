@@ -1,10 +1,11 @@
 import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 import cron from "node-cron";
-import { checkEvent, handleRequest } from "./bots/telegram.js";
+import {  handleRequest } from "./bots/telegram.js";
 import { User, envEvent } from "./bots/db.js";
 import { upcomingEvents } from "./bots/crawler.js";
 import { updateGenre } from "./bots/genre.js";
+import { checkEvent } from "./bots/Fuzzy.js";
 export const getPrice = (text) => {
   let txt_arr = text.split(" ");
   let ind = txt_arr.findIndex((it) => it === "activate");
@@ -47,7 +48,7 @@ async function init() {
       let userQeue = checkEvent(eveName);
       console.log("userQueue", userQeue);
       if (userQeue.length !== 0) {
-        userQeue.forEach((event) => {
+        userQeue.forEach(({item:event}) => {
           console.log("sending " + key + " " + event.ariaLabel.slice(0, 5));
           const price = getPrice(event.ariaLabel);
           const caption = `<a href="${event.href}">${event.ariaLabel}</a>

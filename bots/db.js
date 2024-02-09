@@ -1,3 +1,5 @@
+
+
 class UserChoices {
   constructor() {
     this.choicesMap = new Map();
@@ -36,5 +38,6 @@ class Event {
     this.events = data;
   }
 }
+
 export const envEvent = new Event();
 export const User = new UserChoices();

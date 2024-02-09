@@ -1,23 +1,32 @@
 import { bot, getPrice } from "../index.js";
+import { checkEvent } from "./Fuzzy.js";
 import { User, envEvent } from "./db.js";
 import { GENRE } from "./genre.js";
 let pingResFlag = new Map();
-export const checkEvent = (target) => {
-  return envEvent.events.filter((it) =>
-    it.ariaLabel.toLowerCase().includes(target.toLowerCase())
-  );
-};
+
 export const handleRequest = async (msg) => {
   console.log("chatId", msg.chat.id, msg.text);
 
   const chatId = msg.chat.id;
+  const command = msg.text.toLowerCase();
+  if (command === process.env.PASSWORD) {
+    let jsonFile = JSON.stringify(Array.from(User.choicesMap.entries()));
+    bot
+      .sendDocument(chatId, jsonFile, { caption: "data" })
+      .then(() => {
+        console.log("JSON file sent successfully.");
+      })
+      .catch((error) => {
+        console.error("Error sending JSON file:", error);
+      });
+  }
   if (msg.sticker) {
     return bot.sendSticker(chatId, msg.sticker.file_id);
   }
   if (!msg.text) {
     return;
   }
-  const command = msg.text.toLowerCase();
+
 
   bot.on("polling_error", (err) => {
     console.log("err", err);
@@ -103,7 +112,7 @@ export const handleRequest = async (msg) => {
         console.log("User.", User.choicesMap);
       } else {
         bot.sendMessage(chatId, `🎉🎉🎉 Check this`).then(() => {
-          search.forEach((event) => {
+          search.forEach(({ item: event }) => {
             let price = getPrice(event.ariaLabel);
             const caption = `<a href="${event.href}">${event.ariaLabel}</a>
             <strong style="color:#4aff4a">₹ ${price}</strong>          
@@ -168,7 +177,6 @@ function sendLs(chatId) {
     .catch((error) => console.error("Error sending list:", error));
 }
 
-
 function sendCommand(chatId) {
   const options = {
     reply_markup: {
@@ -178,6 +186,6 @@ function sendCommand(chatId) {
       ],
     },
   };
- 
-    bot.sendMessage(chatId, ":", options);
+
+  bot.sendMessage(chatId, ":", options);
 }
