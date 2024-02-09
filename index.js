@@ -16,8 +16,6 @@ dotenv.config();
 export const bot = new TelegramBot(process.env.TG_BOT_TOKEN, { polling: true });
 
 bot.on("message", handleRequest);
-console.log("CRON_INTERVAL", process.env.CRON_INTERVAL);
-console.log("TG_BOT_TOKEN", process.env.TG_BOT_TOKEN);
 cron.schedule(
   process.env.CRON_INTERVAL,
   () => {

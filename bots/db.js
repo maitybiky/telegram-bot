@@ -3,6 +3,7 @@ const redisConfig = {
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT,
 };
+console.log('redisConfig', redisConfig)
 class UserChoices {
   constructor() {
     this.initialize();
