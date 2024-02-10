@@ -217,7 +217,6 @@ async function pingArg(chatId, msg) {
       bot.sendMessage(chatId, `🎉🎉🎉 Check this`).then(() => {
         search.forEach(({ item: event }) => {
           if (event.suggetion) {
-            console.log("event", event);
             didYmeanFlag.set(chatId, event.event);
             bot.sendMessage(chatId, `${event.event?.query??":"} Partial Match Found \nDid you mean  ? \n ${event.value}`, {
               reply_markup: {
