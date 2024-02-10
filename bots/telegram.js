@@ -219,7 +219,7 @@ async function pingArg(chatId, msg) {
           if (event.suggetion) {
             console.log("event", event);
             didYmeanFlag.set(chatId, event.event);
-            bot.sendMessage(chatId, `Did you mean ${event.value} ?`, {
+            bot.sendMessage(chatId, `${event.event?.query??":"} Partial Match Found \nDid you mean  ? \n ${event.value}`, {
               reply_markup: {
                 keyboard: [[{ text: "Yes" }], [{ text: "No" }]],
                 one_time_keyboard: true, // Hide the custom keyboard after user selects an option

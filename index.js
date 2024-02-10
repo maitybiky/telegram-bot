@@ -48,6 +48,8 @@ async function init() {
               // console.log("caption", caption);
               bot.sendPhoto(key, event.src, { caption, parse_mode: "HTML" });
               User.removeGenre(key, eveName);
+            }else{
+              bot.sendMessage(chatId, `"${event?.event?.query}" Partial Match Found ${event.value} ?`)
             }
           });
         }
