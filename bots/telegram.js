@@ -6,14 +6,13 @@ import { GENRE } from "./genre.js";
 export const handleRequest = async (msg) => {
   const chatId = msg.chat.id;
   const command = msg.text.toLowerCase();
-  console.log('first', command,chatId)
+  console.log("first", command, chatId);
   if (command === process.env.PASSWORD) {
     let userQeue = await User.getAll();
-    userQeue.forEach(([key,value])=>{
+    userQeue.forEach(([key, value]) => {
+      bot.sendMessage(chatId, `${key}\n${value.join(",")}`);
+    });
 
-      bot.sendMessage(chatId, `${key}\n${value.join(',')}`);
-    })
-  
     return;
   }
   if (msg.sticker) {
@@ -27,12 +26,10 @@ export const handleRequest = async (msg) => {
     console.log("err", err);
   });
 
-  if (command !== "/start" ||command!=="/ping") {
-    
-      setTimeout(() => {
-        sendCommand(chatId);
-      }, 2000);
-    
+  if (command !== "/start" || command !== "/ping") {
+    setTimeout(() => {
+      sendCommand(chatId);
+    }, 2000);
   }
   if (command === "/start") {
     start(chatId);
@@ -47,7 +44,7 @@ export const handleRequest = async (msg) => {
   } else if (command === "/rm") {
     sendDeleteList(chatId);
   } else if (command === "/ls") {
-    console.log('ls',chatId)
+    console.log("ls", chatId);
     sendLs(chatId);
   } else if (command === "yes" || command === "no") {
     didYouMean(chatId, command);
@@ -80,7 +77,7 @@ async function sendDeleteList(chatId) {
       const itemToDelete = query.data.split("_")[1];
       const chatId = query.message.chat.id;
       User.removeGenre(chatId, itemToDelete);
-      bot.sendMessage(chatId, `${itemToDelete} deleted successfully! ✅✅✅`)
+      bot.sendMessage(chatId, `${itemToDelete} deleted successfully! ✅✅✅`);
       // console.log("Delete item at index:", index);
     }
   });
@@ -88,7 +85,7 @@ async function sendDeleteList(chatId) {
 
 async function sendLs(chatId) {
   const textList = await User.getUserGenre(chatId);
-  
+
   if (textList.length === 0) {
     return bot.sendMessage(chatId, "Empty 🤷 ");
   }
@@ -105,11 +102,7 @@ async function sendLs(chatId) {
 function sendCommand(chatId) {
   const options = {
     reply_markup: {
-      keyboard: [
-        ["/ping", "/ls"],
-        ["/rm", "/now"],
-        ["/help"]
-      ],
+      keyboard: [["/ping", "/ls"], ["/rm", "/now"], ["/help"]],
     },
   };
 
@@ -152,8 +145,10 @@ async function ping(chatId) {
   await pingResFlag.set(chatId, 1);
 }
 
-function getEvents(chatId, msg, command) {
-  bot.sendMessage(chatId, "Cool you are interested In " + msg.text);
+function getEvents(chatId, msg, command, head = true) {
+  if (head) {
+    bot.sendMessage(chatId, "Cool you are interested In " + msg.text);
+  }
   let filterGenre;
   if (msg.text === "All Events") {
     filterGenre = envEvent.events;
@@ -218,12 +213,18 @@ async function pingArg(chatId, msg) {
         search.forEach(({ item: event }) => {
           if (event.suggetion) {
             didYmeanFlag.set(chatId, event.event);
-            bot.sendMessage(chatId, `${event.event?.query??":"} Partial Match Found \nDid you mean  ? \n ${event.value}`, {
-              reply_markup: {
-                keyboard: [[{ text: "Yes" }], [{ text: "No" }]],
-                one_time_keyboard: true, // Hide the custom keyboard after user selects an option
-              },
-            });
+            bot.sendMessage(
+              chatId,
+              `${
+                event.event?.query ?? ":"
+              } Partial Match Found \nDid you mean  ? \n ${event.value}`,
+              {
+                reply_markup: {
+                  keyboard: [[{ text: "Yes" }], [{ text: "No" }]],
+                  one_time_keyboard: true, // Hide the custom keyboard after user selects an option
+                },
+              }
+            );
           } else {
             let price = getPrice(event.ariaLabel);
             const caption = `<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>`;
@@ -241,3 +242,5 @@ async function pingArg(chatId, msg) {
     );
   }
 }
+
+export { getEvents };

@@ -41,7 +41,7 @@ async function init() {
 
         if (userQeue.length !== 0) {
           userQeue.forEach(({ item: event }) => {
-            console.log('event', event.event.query)
+            console.log("event", event.event.query);
             if (!event.suggetion) {
               const price = getPrice(event.ariaLabel);
               const caption = `<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
@@ -49,8 +49,16 @@ async function init() {
               // console.log("caption", caption);
               bot.sendPhoto(key, event.src, { caption, parse_mode: "HTML" });
               User.removeGenre(key, eveName);
-            }else{
-              bot.sendMessage(key, `"${event?.event?.query??":"}" Partial Match Found ${event.value} ?`)
+            } else {
+              const price = getPrice(event.ariaLabel);
+              const caption = `${
+                event?.event?.query ?? ":"
+              }" Partial Match Found  \n\n<a href="${event.href}">${
+                event.ariaLabel
+              }</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
+          `;
+              // console.log("caption", caption);
+              bot.sendPhoto(key, event.src, { caption, parse_mode: "HTML" });
             }
           });
         }
