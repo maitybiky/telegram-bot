@@ -1,15 +1,17 @@
 import redis from "redis";
 const redisConfig = {
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
+  host: '172.19.0.2',
+  port: 6379,
 };
-
+console.log('redisConfig', redisConfig)
 class UserChoices {
   constructor() {
     this.initialize();
   }
   async initialize() {
     try {
+     console.log('creating db')
+      
       this.db = redis.createClient(redisConfig);
       await this.db.connect();
       this.db.on("error", (err) => console.log("db Client Error", err));
