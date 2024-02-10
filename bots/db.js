@@ -1,17 +1,18 @@
 import redis from "redis";
 const redisConfig = {
-  host: '172.19.0.2',
+  // host: '172.19.0.2',
+  host: "172.19.0.2",
   port: 6379,
 };
-console.log('redisConfig', redisConfig)
+console.log("redisConfig", redisConfig);
 class UserChoices {
   constructor() {
     this.initialize();
   }
   async initialize() {
     try {
-     console.log('creating db')
-      
+      console.log("creating db");
+
       this.db = redis.createClient(redisConfig);
       await this.db.connect();
       this.db.on("error", (err) => console.log("db Client Error", err));
@@ -25,7 +26,7 @@ class UserChoices {
       .sAdd(`db:${userId}`, choice)
       .then(() => {
         this.getAll()
-          .then((data) => console.log("data", data))
+          .then((data) => console.log("datadd", data))
           .catch((errr) => console.log("errr", errr));
       })
       .catch((err) => {
@@ -38,24 +39,19 @@ class UserChoices {
   }
 
   getUserGenre(userId) {
+    console.log("kkk", userId);
     return new Promise((resolve, reject) => {
-      this.db.sMembers(`db:${userId}`, (err, choices) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(choices || []);
-        }
+      this.db.sMembers(`db:${userId}`).then((choices) => {
+        resolve(choices || []);
       });
     });
   }
-  getAll(en=false) {
+  getAll(en = false) {
     return new Promise((resolve, reject) => {
       console.log("getall");
       this.db
         .KEYS("db*")
         .then((keys) => {
-
-
           let obj = {};
           const promises = keys.map((key) => {
             return this.db.sMembers(key).then((members) => {
@@ -65,11 +61,8 @@ class UserChoices {
 
           Promise.all(promises)
             .then(() => {
-              if(en)
-              resolve(obj);
-
-              else
-              resolve(Object.entries(obj));
+              if (en) resolve(obj);
+              else resolve(Object.entries(obj));
             })
             .catch((err) => {
               console.error("Error:", err);
@@ -80,7 +73,7 @@ class UserChoices {
         });
     });
   }
-};
+}
 class Event {
   constructor() {
     this.events = [];
@@ -88,7 +81,7 @@ class Event {
   refreashEvent(data) {
     this.events = data;
   }
-};
+}
 class pingFag {
   constructor() {
     // this.pingClient = null;
@@ -155,7 +148,7 @@ class pingFag {
         });
     });
   }
-};
+}
 export const pingResFlag = new pingFag();
 export const didYmeanFlag = new Map();
 export const envEvent = new Event();

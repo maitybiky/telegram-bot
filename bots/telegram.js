@@ -6,6 +6,7 @@ import { GENRE } from "./genre.js";
 export const handleRequest = async (msg) => {
   const chatId = msg.chat.id;
   const command = msg.text.toLowerCase();
+  console.log('first', command,chatId)
   if (command === process.env.PASSWORD) {
     let userQeue = await User.getAll();
     userQeue.forEach(([key,value])=>{
@@ -26,12 +27,12 @@ export const handleRequest = async (msg) => {
     console.log("err", err);
   });
 
-  if (command !== "/start") {
-    if (!pingResFlag.get(chatId)) {
+  if (command !== "/start" ||command!=="/ping") {
+    
       setTimeout(() => {
         sendCommand(chatId);
       }, 2000);
-    }
+    
   }
   if (command === "/start") {
     start(chatId);
@@ -46,6 +47,7 @@ export const handleRequest = async (msg) => {
   } else if (command === "/rm") {
     sendDeleteList(chatId);
   } else if (command === "/ls") {
+    console.log('ls',chatId)
     sendLs(chatId);
   } else if (command === "yes" || command === "no") {
     didYouMean(chatId, command);
@@ -78,7 +80,7 @@ async function sendDeleteList(chatId) {
       const itemToDelete = query.data.split("_")[1];
       const chatId = query.message.chat.id;
       User.removeGenre(chatId, itemToDelete);
-      bot.sendMessage(chatId, `${itemToDelete} deleted successfully! ✅✅✅`);
+      bot.sendMessage(chatId, `${itemToDelete} deleted successfully! ✅✅✅`)
       // console.log("Delete item at index:", index);
     }
   });
@@ -86,6 +88,7 @@ async function sendDeleteList(chatId) {
 
 async function sendLs(chatId) {
   const textList = await User.getUserGenre(chatId);
+  
   if (textList.length === 0) {
     return bot.sendMessage(chatId, "Empty 🤷 ");
   }
