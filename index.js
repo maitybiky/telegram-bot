@@ -50,15 +50,15 @@ async function init() {
               bot.sendPhoto(key, event.src, { caption, parse_mode: "HTML" });
               User.removeGenre(key, eveName);
             } else {
-              const price = getPrice(event.event.ariaLabel);
+              const price = getPrice(event.event.event.ariaLabel);
               const caption = `${
                 event?.event?.query ?? ":"
-              }"✔️✔️✔️ Partial Match Found  \n\n<a href="${event.event.href}">${
-                event.ariaLabel
+              }"✔️✔️✔️ Partial Match Found  \n\n<a href="${event.event.event.href}">${
+                event.event.event.ariaLabel
               }</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
           `;
               // console.log("caption", caption);
-              bot.sendPhoto(key, event.event.src, { caption, parse_mode: "HTML" });
+              bot.sendPhoto(key, event.event.event.src, { caption, parse_mode: "HTML" });
             }
           });
         }

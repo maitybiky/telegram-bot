@@ -226,15 +226,12 @@ async function pingArg(chatId, msg) {
               }
             );
           } else {
-            const price = getPrice(event.event.ariaLabel);
-            const caption = `${
-              event?.event?.query ?? ":"
-            }"✔️✔️✔️ Partial Match Found  \n\n<a href="${event.event.href}">${
-              event.ariaLabel
-            }</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
-        `;
+            const price = getPrice(event.ariaLabel);
+            const caption = `✅Exact Match 🎉🎉🎉\n<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
+        \n\n`;
             // console.log("caption", caption);
-            bot.sendPhoto(key, event.event.src, { caption, parse_mode: "HTML" });
+            bot.sendPhoto(key, event.src, { caption, parse_mode: "HTML" });
+            User.removeGenre(key, eveName);
           
           }
         });
