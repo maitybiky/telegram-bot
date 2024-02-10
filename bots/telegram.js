@@ -26,7 +26,7 @@ export const handleRequest = async (msg) => {
     console.log("err", err);
   });
 
-  if (command !== "/start" || command !== "/ping") {
+  if (command !== "/start" && command !== "/ping") {
     setTimeout(() => {
       sendCommand(chatId);
     }, 2000);
