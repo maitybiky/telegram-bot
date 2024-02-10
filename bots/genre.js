@@ -52,7 +52,7 @@ export const updateGenre = async () => {
       await browser.close();
       resolve(rewData);
     } catch (error) {
-      console.log("error", error);
+      //  console.log("errorupdategenre", error);
       throw error;
     }
   });

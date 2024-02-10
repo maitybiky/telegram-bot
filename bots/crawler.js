@@ -36,7 +36,7 @@ export const upcomingEvents = async () => {
       resolve(events);
       await browser.close();
     } catch (error) {
-      console.log("error", error);
+      //  console.log("errordatacrawl", error);
       reject(error);
       // throw error;
     }
@@ -70,10 +70,10 @@ const getEvents = async (page) => {
           });
         }
       }
-      console.log("eventCardData.length", eventCardData.length);
+      //  console.log("eventCardData.length", eventCardData.length);
       resolve(eventCardData);
     } catch (error) {
-      console.log("error", error);
+      //  console.log("error", error);
       reject(null);
     }
   });

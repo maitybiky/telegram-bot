@@ -4,42 +4,67 @@ const redisConfig = {
   host: "172.19.0.2",
   port: 6379,
 };
-console.log("redisConfig", redisConfig);
+//  console.log("redisConfig", redisConfig);
 class UserChoices {
   constructor() {
     this.initialize();
   }
   async initialize() {
     try {
-      console.log("creating db");
+      //  console.log("creating db");
 
       this.db = redis.createClient(redisConfig);
       await this.db.connect();
-      this.db.on("error", (err) => console.log("db Client Error", err));
+      this.db.on("error", (err) =>  console.log("db Client Error", err));
     } catch (error) {
-      console.error("Error initializing UserChoices:", error);
+      //  console.error("Error initializing UserChoices:", error);
     }
   }
-  addGenre(userId, choice) {
-    console.log("choise", choice);
+  adDnd(chatId, choice) {
+    this.db.set(`dnd:${chatId}:${choice}`, "1").catch((err) => {
+      // Handling errors
+      //  console.error("Error occurred:", err);
+    });
+  }
+  hasDnd(chatId, choice) {
+    return new Promise((resolve, reject) => {
+      //  console.log(`dnd:${chatId}:${choice}`, `dnd:${chatId}:${choice}`)
+      this.db
+        .exists(`dnd:${chatId}:${choice}`)
+        .then((data) => {
+          resolve(data);
+        })
+        .catch(() => {
+          //  console.log("has err", err);
+
+          reject();
+        });
+    });
+  }
+  remDnd(chatId,choice) {
     this.db
-      .sAdd(`db:${userId}`, choice)
-      .then(() => {
-        this.getAll()
-          .then((data) => console.log("datadd", data))
-          .catch((errr) => console.log("errr", errr));
-      })
+      .del(`dnd:${chatId}:${choice}`)
+      
       .catch((err) => {
-        // Handling errors
-        console.error("Error occurred:", err);
+        //  console.log("del err", err);
+
+       
       });
   }
+  addGenre(userId, choice) {
+    //  console.log("choise", choice);
+    this.db.sAdd(`db:${userId}`, choice).catch((err) => {
+      // Handling errors
+      //  console.error("Error occurred:", err);
+    });
+  }
   removeGenre(userId, choiceToRemove) {
+    //  console.log('bv', choiceToRemove)
     this.db.sRem(`db:${userId}`, choiceToRemove);
+    this.remDnd()
   }
 
   getUserGenre(userId) {
-    console.log("kkk", userId);
     return new Promise((resolve, reject) => {
       this.db.sMembers(`db:${userId}`).then((choices) => {
         resolve(choices || []);
@@ -48,7 +73,7 @@ class UserChoices {
   }
   getAll(en = false) {
     return new Promise((resolve, reject) => {
-      console.log("getall");
+      //  console.log("getall");
       this.db
         .KEYS("db*")
         .then((keys) => {
@@ -65,7 +90,7 @@ class UserChoices {
               else resolve(Object.entries(obj));
             })
             .catch((err) => {
-              console.error("Error:", err);
+              //  console.error("Error:", err);
             });
         })
         .catch((err) => {
@@ -91,7 +116,7 @@ class pingFag {
     this.pingClient = redis.createClient(redisConfig);
     await this.pingClient.connect();
     this.pingClient.on("error", (err) =>
-      console.log("ping flag Client Error", err)
+       console.log("ping flag Client Error", err)
     );
   }
   set(key, value) {
@@ -102,7 +127,7 @@ class pingFag {
           resolve();
         })
         .catch((err) => {
-          console.log("set err", err);
+          //  console.log("set err", err);
           reject();
         });
     });
@@ -115,7 +140,7 @@ class pingFag {
           resolve(data);
         })
         .catch(() => {
-          console.log("has err", err);
+          //  console.log("has err", err);
 
           reject();
         });
@@ -129,7 +154,7 @@ class pingFag {
           resolve(data);
         })
         .catch((err) => {
-          console.log("get err", err);
+          //  console.log("get err", err);
           reject();
         });
     });
@@ -138,13 +163,9 @@ class pingFag {
     return new Promise((resolve, reject) => {
       this.pingClient
         .del(`${key}`)
-        .then((data) => {
-          resolve(data);
-        })
-        .catch(() => {
-          console.log("del err", err);
-
-          reject();
+      
+        .catch((err) => {
+         
         });
     });
   }
