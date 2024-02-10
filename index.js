@@ -41,6 +41,7 @@ async function init() {
 
         if (userQeue.length !== 0) {
           userQeue.forEach(({ item: event }) => {
+            console.log('event', event.event.query)
             if (!event.suggetion) {
               const price = getPrice(event.ariaLabel);
               const caption = `<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
