@@ -216,8 +216,8 @@ async function pingArg(chatId, msg) {
             bot.sendMessage(
               chatId,
               `${
-                event.event?.query ?? ":"
-              } Partial Match Found \nDid you mean  ? \n ${event.value}`,
+                event.event?.query ?? ":" 
+              }\n Partial Match Found \nDid you mean  ? \n ${event.value}`,
               {
                 reply_markup: {
                   keyboard: [[{ text: "Yes" }], [{ text: "No" }]],

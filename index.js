@@ -44,8 +44,8 @@ async function init() {
             console.log("event", event.event.query);
             if (!event.suggetion) {
               const price = getPrice(event.ariaLabel);
-              const caption = `<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
-          `;
+              const caption = `✅Exact Match 🎉🎉🎉\n<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
+          \n\n`;
               // console.log("caption", caption);
               bot.sendPhoto(key, event.src, { caption, parse_mode: "HTML" });
               User.removeGenre(key, eveName);
@@ -53,7 +53,7 @@ async function init() {
               const price = getPrice(event.ariaLabel);
               const caption = `${
                 event?.event?.query ?? ":"
-              }" Partial Match Found  \n\n<a href="${event.href}">${
+              }"✔️✔️✔️ Partial Match Found  \n\n<a href="${event.href}">${
                 event.ariaLabel
               }</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
           `;
