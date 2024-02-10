@@ -41,7 +41,7 @@ async function init() {
 
         if (userQeue.length !== 0) {
           userQeue.forEach(({ item: event }) => {
-            console.log("event", event.event.query);
+            console.log("event", event);
             if (!event.suggetion) {
               const price = getPrice(event.ariaLabel);
               const caption = `✅Exact Match 🎉🎉🎉\n<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
