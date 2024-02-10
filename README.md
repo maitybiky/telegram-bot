@@ -1,26 +1,4 @@
-# Event Notifier
-https://t.me/the_event_nerd_bot
-
-
-![Node.js Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Node.js_logo.svg/1280px-Node.js_logo.svg.png)
-
-Brief description of Node.js usage in your project.
-
-### Puppeteer.js
-
-![Puppeteer.js Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Puppeteer_logo.svg/1280px-Puppeteer_logo.svg.png)
-
-Brief description of Puppeteer.js usage in your project.
-
-### Redis
-
-![Redis Logo](https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/Redis_Logo.svg/800px-Redis_Logo.svg.png)
-
-Brief description of Redis usage in your project.
-
-### Docker
-
-![Docker Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Docker_%28container_engine%29_logo.svg/1280px-Docker_%28container_engine%29_logo.svg.png)
+![Node.js Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Node.js_logo.svg/20px-Node.js_logo.svg.png) ![Puppeteer.js Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Puppeteer_logo.svg/20px-Puppeteer_logo.svg.png) ![Redis Logo](https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/Redis_Logo.svg/20px-Redis_Logo.svg.png) ![Docker Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Docker_%28container_engine%29_logo.svg/20px-Docker_%28container_engine%29_logo.svg.png)
 # docker file
 
 <p align="left"> <a href="https://www.docker.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original-wordmark.svg" alt="docker" width="40" height="40"/> </a> </p>
