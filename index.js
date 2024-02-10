@@ -50,7 +50,7 @@ async function init() {
               bot.sendPhoto(key, event.src, { caption, parse_mode: "HTML" });
               User.removeGenre(key, eveName);
             }else{
-              bot.sendMessage(chatId, `"${event?.event?.query??":"}" Partial Match Found ${event.value} ?`)
+              bot.sendMessage(key, `"${event?.event?.query??":"}" Partial Match Found ${event.value} ?`)
             }
           });
         }
