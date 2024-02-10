@@ -226,9 +226,16 @@ async function pingArg(chatId, msg) {
               }
             );
           } else {
-            let price = getPrice(event.ariaLabel);
-            const caption = `<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>`;
-            bot.sendPhoto(chatId, event.src, { caption, parse_mode: "HTML" });
+            const price = getPrice(event.event.ariaLabel);
+            const caption = `${
+              event?.event?.query ?? ":"
+            }"✔️✔️✔️ Partial Match Found  \n\n<a href="${event.event.href}">${
+              event.ariaLabel
+            }</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
+        `;
+            // console.log("caption", caption);
+            bot.sendPhoto(key, event.event.src, { caption, parse_mode: "HTML" });
+          
           }
         });
       });
