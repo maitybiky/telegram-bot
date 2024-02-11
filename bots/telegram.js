@@ -10,13 +10,14 @@ import {
   pingResFlag,
 } from "./db.js";
 import { GENRE } from "./genre.js";
+const messageIds = [];
 
 export const handleRequest = async (msg) => {
   const chatId = msg.chat.id;
   const command = msg.text.toLowerCase();
   let an = "an" + process.env.PASSWORD;
-  console.log('an', msg.text)
-  console.log('first', an)
+  console.log("an", msg.text);
+  console.log("first", an);
   if (msg.text === an) {
     console.log("dss");
     const fileStream = fs.createReadStream("./analytics.json");
@@ -37,8 +38,6 @@ export const handleRequest = async (msg) => {
       addAnalytics(userData);
     }
   }
-
- 
 
   //  console.log("first", command, chatId);
   if (command === process.env.PASSWORD) {
@@ -80,8 +79,6 @@ export const handleRequest = async (msg) => {
   } else if (command === "/ls") {
     //  console.log("ls", chatId);
     sendLs(chatId);
-  } else if (command === "yes" || command === "no") {
-    didYouMean(chatId, command);
   } else {
     pingArg(chatId, msg);
   }
@@ -200,26 +197,6 @@ function getEvents(chatId, msg, command, head = true) {
   });
 }
 
-function didYouMean(chatId, command) {
-  const event = didYmeanFlag.get(chatId);
-  if (event && command === "no") {
-    bot.sendMessage(
-      chatId,
-      ` You will be notified  for ${event.query}.\n(Hopefully 🫣🫠🫠)`
-    );
-
-    User.addGenre(chatId, event.query);
-    bot.sendMessage(chatId, ` ${event.query} saved ✅✅✅`);
-  }
-
-  if (command === "yes" && event) {
-    let price = getPrice(event.event.ariaLabel);
-    const caption = `<a href="${event.event.href}">${event.event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>`;
-    bot.sendPhoto(chatId, event.event.src, { caption, parse_mode: "HTML" });
-    didYmeanFlag.delete(chatId);
-  }
-}
-
 async function pingArg(chatId, msg) {
   let isExistFlag = await pingResFlag.has(chatId);
   let flagStatus = await pingResFlag.get(chatId);
@@ -254,7 +231,7 @@ async function pingArg(chatId, msg) {
                     inline_keyboard: ["Yes", "No"].map((item, index) => [
                       {
                         text: `${item}`,
-                        callback_data: `dec_${item}_${event.value}_${event.event?.query}`,
+                        callback_data: `dec_${item}_${event.value}_${event.event?.query}_${chatId}`,
                       },
                     ]),
                     one_time_keyboard: true,
@@ -265,26 +242,7 @@ async function pingArg(chatId, msg) {
               .then((sentMessage) => {
                 // Store the message ID for later deletion if necessary
                 const messageId = sentMessage.message_id;
-
-                bot.on("callback_query", (query) => {
-                  if (query.data.startsWith("dec_")) {
-                    const shouldDelete = query.data.split("_")[1];
-                    const suggetion = query.data.split("_")[2];
-                    const userquery = query.data.split("_")[3];
-                    //  console.log("itemToDelete", itemToDelete);
-                    if (shouldDelete === "Yes") {
-                      bot.sendMessage(chatId, `Great 🎉🎉🎉`);
-                      pingResFlag.set(chatId, 1);
-                      pingArg(chatId, { text: suggetion });
-                      User.removeGenre(chatId, userquery);
-                    } else {
-                      User.adDnd(chatId, userquery);
-                      bot.sendMessage(chatId, `Ok, You will be notified for ${userquery}`);
-                      // Delete the message
-                      bot.deleteMessage(chatId, messageId);
-                    }
-                  }
-                });
+                messageIds.push({ messageId, key: event.value });
               })
               .catch((error) => {
                 //  console.error("Error sending message:", error);
@@ -312,4 +270,29 @@ async function pingArg(chatId, msg) {
   }
 }
 
-export { getEvents, sendCommand };
+
+
+export const listenCallback=(query)=>{
+  if (query.data.startsWith("dec_")) {
+    const shouldDelete = query.data.split("_")[1];
+    const suggetion = query.data.split("_")[2];
+    const userquery = query.data.split("_")[3];
+    const chatId = query.data.split("_")[4];
+    //  console.log("itemToDelete", itemToDelete);
+    if (shouldDelete === "Yes") {
+      bot.sendMessage(chatId, `Great 🎉🎉🎉`);
+      pingResFlag.set(chatId, 1);
+      User.removeGenre(chatId, userquery);
+      pingArg(chatId, { text: suggetion });
+    } else {
+      User.addGenre(chatId, userquery);
+      User.adDnd(chatId, userquery);
+      bot.sendMessage(chatId, `Ok, You will be notified for ${userquery}`);
+      // Delete the message
+      let delind = messageIds.findIndex((it) => it.key === suggetion);
+      if (delind > 0) bot.deleteMessage(chatId, messageIds[delind].messageId);
+    }
+  }
+}
+
+export { getEvents, sendCommand, pingArg };

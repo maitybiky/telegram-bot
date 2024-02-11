@@ -124,7 +124,7 @@ class pingFag {
   set(key, value) {
     return new Promise((resolve, reject) => {
       this.pingClient
-        .set(`${key}`, value ? 1 : 0)
+        .set(`${key}`, value ? 1 : 0,{ EX: 15 })
         .then(() => {
           resolve();
         })

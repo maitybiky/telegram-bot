@@ -1,10 +1,11 @@
 import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 import cron from "node-cron";
-import { handleRequest } from "./bots/telegram.js";
+import { handleRequest, listenCallback, pingArg } from "./bots/telegram.js";
 import { User, envEvent } from "./bots/db.js";
 import { upcomingEvents } from "./bots/crawler.js";
 import { checkEvent } from "./bots/Fuzzy.js";
+
 export const getPrice = (text) => {
   let txt_arr = text.split(" ");
   let ind = txt_arr.findIndex((it) => it === "activate");
@@ -15,6 +16,8 @@ dotenv.config();
 export const bot = new TelegramBot(process.env.TG_BOT_TOKEN, { polling: true });
 
 bot.on("message", handleRequest);
+bot.on("callback_query", listenCallback);
+
 cron.schedule(
   process.env.CRON_INTERVAL,
   () => {
@@ -27,10 +30,7 @@ cron.schedule(
   }
 );
 async function init() {
-  console.log('GENRE', GENRE)
   try {
-  
-
     let data = await upcomingEvents();
 
     envEvent.refreashEvent(data);
@@ -81,13 +81,15 @@ async function init() {
                   bot.on("callback_query", (query) => {
                     if (query.data.startsWith("dec_")) {
                       const shouldDelete = query.data.split("_")[1];
-                      const itemToDelete = query.data.split("_")[2];
+                      const suggetion = query.data.split("_")[2];
+                      const userquery = query.data.split("_")[3];
                       //  console.log("itemToDelete", itemToDelete);
                       if (shouldDelete === "Yes") {
                         bot.sendMessage(key, `Great 🎉🎉🎉`);
-                        User.removeGenre(key, itemToDelete);
+                        User.removeGenre(key, userquery);
+                        pingArg(key, { text: suggetion });
                       } else {
-                        User.adDnd(key, itemToDelete);
+                        User.adDnd(key, userquery);
                         bot.sendMessage(key, `Ok, You will be notified`);
                         // Delete the message
                         bot.deleteMessage(key, messageId);
