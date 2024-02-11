@@ -1,7 +1,7 @@
 import redis from "redis";
 const redisConfig = {
   // host: '172.19.0.2',
-  host: "172.19.0.2",
+  host: "172.17.0.2",
   port: 6379,
 };
 //  console.log("redisConfig", redisConfig);
@@ -21,7 +21,7 @@ class UserChoices {
     }
   }
   adDnd(chatId, choice) {
-    this.db.set(`dnd:${chatId}:${choice}`, "1").catch((err) => {
+    this.db.set(`dnd:${chatId}:${choice}`, "1",'EX', 10).catch((err) => {
       // Handling errors
       //  console.error("Error occurred:", err);
     });

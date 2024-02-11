@@ -69,9 +69,7 @@ async function sendDeleteList(chatId) {
     },
   };
 
-  bot
-    .sendMessage(chatId, "Tap to Delete", options)
-    
+  bot.sendMessage(chatId, "Tap to Delete", options);
 
   bot.on("callback_query", (query) => {
     if (query.data.startsWith("delete_")) {
@@ -94,8 +92,7 @@ async function sendLs(chatId) {
     .map((item, index) => `${index + 1}. ${item}`)
     .join("\n");
   //  console.log("formattedText", formattedText);
-  bot
-    .sendMessage(chatId, formattedText, { parse_mode: "HTML" })
+  bot.sendMessage(chatId, formattedText, { parse_mode: "HTML" });
 }
 
 function sendCommand(chatId) {
@@ -133,7 +130,7 @@ function now(chatId) {
     bot.sendMessage(chatId, "Event List:", options);
     bot.sendMessage(chatId, "Tap Your favourite Genre");
   } else {
-    bot.sendMessage(chatId, "Not Found !!! try again after 2 mins...");
+    bot.sendMessage(chatId, "Not Found !!! try again within 2 mins...");
   }
 }
 
@@ -206,6 +203,7 @@ async function pingArg(chatId, msg) {
 
       User.addGenre(chatId, userResponse);
       bot.sendMessage(chatId, ` ${userResponse} saved ✅✅✅`);
+      sendCommand(chatId);
       //  console.log("User.", User.choicesMap);
     } else {
       bot.sendMessage(chatId, `🎉🎉🎉 Check this`).then(() => {
@@ -245,7 +243,7 @@ async function pingArg(chatId, msg) {
                       pingArg(chatId, { text: itemToDelete });
                       User.removeGenre(chatId, itemToDelete);
                     } else {
-                      User.adDnd(chatId, itemToDelete);
+                      User.addGenre(chatId, itemToDelete);
                       bot.sendMessage(chatId, `Ok, You will be notified`);
                       // Delete the message
                       bot.deleteMessage(chatId, messageId);
@@ -264,6 +262,7 @@ async function pingArg(chatId, msg) {
             // //  console.log("caption", caption);
             bot.sendPhoto(chatId, event.src, { caption, parse_mode: "HTML" });
             User.removeGenre(chatId, query);
+            sendCommand(chatId);
           }
         });
       });
@@ -278,4 +277,4 @@ async function pingArg(chatId, msg) {
   }
 }
 
-export { getEvents };
+export { getEvents, sendCommand };

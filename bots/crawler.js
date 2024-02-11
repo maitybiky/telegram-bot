@@ -1,25 +1,26 @@
 import puppeteer from "puppeteer";
 import dotenv from "dotenv";
+import { updateGenre } from "./genre.js";
 
 dotenv.config();
 export const upcomingEvents = async () => {
   return new Promise(async (resolve, reject) => {
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-accelerated-2d-canvas",
+        "--no-first-run",
+        "--no-zygote",
+        "--disable-gpu",
+      ],
+    });
     try {
-      const browser = await puppeteer.launch({
-        headless: "new",
-       executablePath:process.env.PUPPETEER_EXECUTABLE_PATH,
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-accelerated-2d-canvas",
-          "--no-first-run",
-          "--no-zygote",
-          "--disable-gpu",
-        ],
-      });
-
       const page = await browser.newPage();
+      await updateGenre(page);
       page.setDefaultNavigationTimeout(120000);
       await page.goto(`https://insider.in/all-events-in-kolkata`);
       await page.evaluate(() => {
@@ -36,7 +37,9 @@ export const upcomingEvents = async () => {
       resolve(events);
       await browser.close();
     } catch (error) {
-      //  console.log("errordatacrawl", error);
+      console.log("errordatacrawl", error);
+      browser.close();
+
       reject(error);
       // throw error;
     }
