@@ -1,4 +1,5 @@
 import redis from "redis";
+import fs from "fs";
 const redisConfig = {
   // host: '172.19.0.2',
   host: "172.17.0.2",
@@ -15,16 +16,18 @@ class UserChoices {
 
       this.db = redis.createClient(redisConfig);
       await this.db.connect();
-      this.db.on("error", (err) =>  console.log("db Client Error", err));
+      this.db.on("error", (err) => console.log("db Client Error", err));
     } catch (error) {
       //  console.error("Error initializing UserChoices:", error);
     }
   }
   adDnd(chatId, choice) {
-    this.db.set(`dnd:${chatId}:${choice}`, "1",'EX', 10).catch((err) => {
-      // Handling errors
-      //  console.error("Error occurred:", err);
-    });
+    this.db
+      .set(`dnd:${chatId}:${choice}`, "1", { EX: 7 * 24 * 60 * 60 })
+      .catch((err) => {
+        // Handling errors
+        //  console.error("Error occurred:", err);
+      });
   }
   hasDnd(chatId, choice) {
     return new Promise((resolve, reject) => {
@@ -41,14 +44,12 @@ class UserChoices {
         });
     });
   }
-  remDnd(chatId,choice) {
+  remDnd(chatId, choice) {
     this.db
       .del(`dnd:${chatId}:${choice}`)
-      
+
       .catch((err) => {
         //  console.log("del err", err);
-
-       
       });
   }
   addGenre(userId, choice) {
@@ -61,7 +62,7 @@ class UserChoices {
   removeGenre(userId, choiceToRemove) {
     //  console.log('bv', choiceToRemove)
     this.db.sRem(`db:${userId}`, choiceToRemove);
-    this.remDnd()
+    this.remDnd();
   }
 
   getUserGenre(userId) {
@@ -99,6 +100,7 @@ class UserChoices {
     });
   }
 }
+
 class Event {
   constructor() {
     this.events = [];
@@ -116,7 +118,7 @@ class pingFag {
     this.pingClient = redis.createClient(redisConfig);
     await this.pingClient.connect();
     this.pingClient.on("error", (err) =>
-       console.log("ping flag Client Error", err)
+      console.log("ping flag Client Error", err)
     );
   }
   set(key, value) {
@@ -163,13 +165,32 @@ class pingFag {
     return new Promise((resolve, reject) => {
       this.pingClient
         .del(`${key}`)
-      
-        .catch((err) => {
-         
-        });
+
+        .catch((err) => {});
     });
   }
 }
+export const addAnalytics = (obj) => {
+
+  const filePath = "./analytics.json";
+  fs.readFile(filePath, "utf-8", (err, res) => {
+    if (err) {
+      console.log("error", err);
+      return;
+    }
+    
+    let prevData = JSON.parse(res);
+    prevData.push(obj);
+    const updatedJson = JSON.stringify(prevData, null, 2);
+
+    fs.writeFile(filePath, updatedJson, (err) => {
+      if (err) {
+        console.log("err", err);
+      }
+      return
+    });
+  });
+};
 export const pingResFlag = new pingFag();
 export const didYmeanFlag = new Map();
 export const envEvent = new Event();

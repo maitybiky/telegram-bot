@@ -1,18 +1,17 @@
 import Fuse from "fuse.js";
-import { envEvent } from "./db.js";
-
+import { addAnalytics, envEvent } from "./db.js";
 
 export const checkEvent = (query) => {
   if (envEvent.events.length === 0) {
     return [];
   }
-  
+
   let exactMatch = envEvent.events.filter((str) =>
     str.ariaLabel.toLowerCase().includes(query.toLowerCase())
   );
   if (exactMatch.length > 0) {
     return exactMatch.map((it) => {
-      return { item: it,query };
+      return { item: it, query };
     });
   } else {
     const fuse = new Fuse(envEvent.events, {
@@ -41,6 +40,6 @@ export const checkEvent = (query) => {
           event: { event: res[0].item, query },
         },
       },
-    ]
+    ];
   }
 };

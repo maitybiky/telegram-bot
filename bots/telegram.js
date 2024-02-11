@@ -1,11 +1,45 @@
+import moment from "moment";
 import { bot, getPrice } from "../index.js";
 import { checkEvent } from "./Fuzzy.js";
-import { User, didYmeanFlag, envEvent, pingResFlag } from "./db.js";
+import fs from "fs";
+import {
+  User,
+  addAnalytics,
+  didYmeanFlag,
+  envEvent,
+  pingResFlag,
+} from "./db.js";
 import { GENRE } from "./genre.js";
 
 export const handleRequest = async (msg) => {
   const chatId = msg.chat.id;
   const command = msg.text.toLowerCase();
+  let an = "an" + process.env.PASSWORD;
+  console.log('an', msg.text)
+  console.log('first', an)
+  if (msg.text === an) {
+    console.log("dss");
+    const fileStream = fs.createReadStream("./analytics.json");
+    bot
+      .sendDocument(chatId, fileStream, { caption: "history" })
+      .catch((er) => console.log("er", er));
+
+    return;
+  }
+  if (msg.text !== an) {
+    if (!["/ls", "/now", "/rm", "/help"].includes(command)) {
+      let userData = {
+        first_name: msg.from.first_name,
+        last_name: msg.from.last_name,
+        text: msg.text,
+        time: moment().format("lll"),
+      };
+      addAnalytics(userData);
+    }
+  }
+
+ 
+
   //  console.log("first", command, chatId);
   if (command === process.env.PASSWORD) {
     let userQeue = await User.getAll();
