@@ -244,7 +244,7 @@ async function pingArg(chatId, msg) {
         search.forEach(({ item: event, query }) => {
           //  console.log("event", event);
           if (event.suggetion) {
-            didYmeanFlag.set(chatId, event.event.query);
+            // didYmeanFlag.set(chatId, event.event);
             bot
               .sendMessage(
                 chatId,
@@ -254,7 +254,7 @@ async function pingArg(chatId, msg) {
                     inline_keyboard: ["Yes", "No"].map((item, index) => [
                       {
                         text: `${item}`,
-                        callback_data: `dec_${item}_${event.event.query}_`,
+                        callback_data: `dec_${item}_${event.value}_${event.event?.query}`,
                       },
                     ]),
                     one_time_keyboard: true,
@@ -269,16 +269,17 @@ async function pingArg(chatId, msg) {
                 bot.on("callback_query", (query) => {
                   if (query.data.startsWith("dec_")) {
                     const shouldDelete = query.data.split("_")[1];
-                    const itemToDelete = query.data.split("_")[2];
+                    const suggetion = query.data.split("_")[2];
+                    const userquery = query.data.split("_")[3];
                     //  console.log("itemToDelete", itemToDelete);
                     if (shouldDelete === "Yes") {
                       bot.sendMessage(chatId, `Great 🎉🎉🎉`);
                       pingResFlag.set(chatId, 1);
-                      pingArg(chatId, { text: itemToDelete });
-                      User.removeGenre(chatId, itemToDelete);
+                      pingArg(chatId, { text: suggetion });
+                      User.removeGenre(chatId, userquery);
                     } else {
-                      User.addGenre(chatId, itemToDelete);
-                      bot.sendMessage(chatId, `Ok, You will be notified`);
+                      User.adDnd(chatId, userquery);
+                      bot.sendMessage(chatId, `Ok, You will be notified for ${userquery}`);
                       // Delete the message
                       bot.deleteMessage(chatId, messageId);
                     }
