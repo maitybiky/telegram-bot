@@ -27,6 +27,7 @@ cron.schedule(
   }
 );
 async function init() {
+  console.log('GENRE', GENRE)
   try {
   
 
