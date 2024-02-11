@@ -244,7 +244,7 @@ async function pingArg(chatId, msg) {
         search.forEach(({ item: event, query }) => {
           //  console.log("event", event);
           if (event.suggetion) {
-            didYmeanFlag.set(chatId, event.event.event.query);
+            didYmeanFlag.set(chatId, event.event.query);
             bot
               .sendMessage(
                 chatId,
@@ -254,7 +254,7 @@ async function pingArg(chatId, msg) {
                     inline_keyboard: ["Yes", "No"].map((item, index) => [
                       {
                         text: `${item}`,
-                        callback_data: `dec_${item}_${event.value}_`,
+                        callback_data: `dec_${item}_${event.event.query}_`,
                       },
                     ]),
                     one_time_keyboard: true,
