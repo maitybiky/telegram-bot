@@ -16,8 +16,6 @@ export const handleRequest = async (msg) => {
   const chatId = msg.chat.id;
   const command = msg.text.toLowerCase();
   let an = "an" + process.env.PASSWORD;
-  console.log("an", msg.text);
-  console.log("first", an);
   if (msg.text === an) {
     console.log("dss");
     const fileStream = fs.createReadStream("./analytics.json");
