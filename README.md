@@ -33,16 +33,18 @@ CMD ["node", "index.js"]
 version: "3.8"
 
 services:
-node:
-build:
-context: .
-dockerfile: dockerfile
-depends_on: - redis
-
+  node:
+    build:
+      context: .
+      dockerfile: dockerfile
+    depends_on:
+      - redis
     network_mode: "host"
 
-redis:
-image: redis:latest
+    restart: "on-failure"
+
+  redis:
+    image: redis:latest
 
     ports:
       - "6379:6379"
