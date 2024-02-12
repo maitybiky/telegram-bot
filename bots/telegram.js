@@ -289,7 +289,7 @@ export const listenCallback=(query)=>{
       User.adDnd(chatId, userquery);
       bot.sendMessage(chatId, `Ok, You will be notified for ${userquery}`);
       // Delete the message
-      let delind = messageIds.findIndchatIdex((it) => it.key === suggetion);
+      let delind = messageIds.findIndex((it) => it.key === suggetion);
       if (delind > 0) bot.deleteMessage(chatId, messageIds[delind].messageId);
     }
   }
