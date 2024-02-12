@@ -7,8 +7,9 @@ services:
       dockerfile: dockerfile
     depends_on:
       - redis
-
     network_mode: "host"
+
+    restart: "on-failure"
     
 
   redis:
@@ -17,5 +18,5 @@ services:
     ports:
       - "6379:6379"
     command: redis-server --bind 0.0.0.0
-
+    
     
