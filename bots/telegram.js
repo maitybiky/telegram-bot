@@ -10,7 +10,7 @@ import {
   pingResFlag,
 } from "./db.js";
 import { GENRE } from "./genre.js";
-const messageIds = [];
+export const messageIds = [];
 
 export const handleRequest = async (msg) => {
   const chatId = msg.chat.id;
@@ -281,7 +281,7 @@ export const listenCallback=(query)=>{
     //  console.log("itemToDelete", itemToDelete);
     if (shouldDelete === "Yes") {
       bot.sendMessage(chatId, `Great 🎉🎉🎉`);
-      pingResFlag.set(chatId, 1);
+      pingResFlag.set(chatId, 0);
       User.removeGenre(chatId, userquery);
       pingArg(chatId, { text: suggetion });
     } else {
@@ -289,7 +289,7 @@ export const listenCallback=(query)=>{
       User.adDnd(chatId, userquery);
       bot.sendMessage(chatId, `Ok, You will be notified for ${userquery}`);
       // Delete the message
-      let delind = messageIds.findIndex((it) => it.key === suggetion);
+      let delind = messageIds.findIndchatIdex((it) => it.key === suggetion);
       if (delind > 0) bot.deleteMessage(chatId, messageIds[delind].messageId);
     }
   }

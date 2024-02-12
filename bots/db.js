@@ -2,10 +2,10 @@ import redis from "redis";
 import fs from "fs";
 const redisConfig = {
   // host: '172.19.0.2',
-  host: "172.17.0.2",
-  port: 6379,
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
 };
-//  console.log("redisConfig", redisConfig);
+ console.log("redisConfig", redisConfig);
 class UserChoices {
   constructor() {
     this.initialize();
@@ -62,7 +62,7 @@ class UserChoices {
   removeGenre(userId, choiceToRemove) {
     //  console.log('bv', choiceToRemove)
     this.db.sRem(`db:${userId}`, choiceToRemove);
-    this.remDnd();
+    this.remDnd(userId,choiceToRemove);
   }
 
   getUserGenre(userId) {
@@ -191,6 +191,7 @@ export const addAnalytics = (obj) => {
     });
   });
 };
+
 export const pingResFlag = new pingFag();
 export const didYmeanFlag = new Map();
 export const envEvent = new Event();

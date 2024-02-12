@@ -8,16 +8,14 @@ services:
     depends_on:
       - redis
 
-    networks:
-      - redisnet  
+    network_mode: "host"
+    
 
   redis:
     image: redis:latest
-    networks:
-      - redisnet
 
     ports:
       - "6379:6379"
+    command: redis-server --bind 0.0.0.0
 
-networks:
-  redisnet:
+    
