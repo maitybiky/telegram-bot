@@ -8,15 +8,15 @@ services:
     depends_on:
       - redis
     network_mode: "host"
-
     restart: "on-failure"
-    
 
   redis:
     image: redis:latest
-
     ports:
       - "6379:6379"
     command: redis-server --bind 0.0.0.0
-    
-    
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

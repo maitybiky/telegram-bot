@@ -5,7 +5,6 @@ import fs from "fs";
 import {
   User,
   addAnalytics,
-  didYmeanFlag,
   envEvent,
   pingResFlag,
 } from "./db.js";
@@ -101,13 +100,7 @@ async function sendDeleteList(chatId) {
   bot.sendMessage(chatId, "Tap to Delete", options);
 
   bot.on("callback_query", (query) => {
-    if (query.data.startsWith("delete_")) {
-      const itemToDelete = query.data.split("_")[1];
-      const chatId = query.message.chat.id;
-      User.removeGenre(chatId, itemToDelete);
-      bot.sendMessage(chatId, `${itemToDelete} deleted successfully! ✅✅✅`);
-      // //  console.log("Delete item at index:", index);
-    }
+    
   });
 }
 
@@ -240,7 +233,7 @@ async function pingArg(chatId, msg) {
               .then((sentMessage) => {
                 // Store the message ID for later deletion if necessary
                 const messageId = sentMessage.message_id;
-                messageIds.push({ messageId, key: event.value });
+                messageIds.push({ messageId, key: event.value,chatId });
               })
               .catch((error) => {
                 //  console.error("Error sending message:", error);
@@ -250,9 +243,9 @@ async function pingArg(chatId, msg) {
             const price = getPrice(event.ariaLabel);
             const caption = `✅Exact Match 🎉🎉🎉\n[${query}]\n\n<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
         \n\n`;
-            // //  console.log("caption", caption);
+         
             bot.sendPhoto(chatId, event.src, { caption, parse_mode: "HTML" });
-            User.removeGenre(chatId, query);
+            User.removeGenre(chatId, query,'ping');
             sendCommand(chatId);
           }
         });
@@ -280,7 +273,7 @@ export const listenCallback=(query)=>{
     if (shouldDelete === "Yes") {
       bot.sendMessage(chatId, `Great 🎉🎉🎉`);
       pingResFlag.set(chatId, 0);
-      User.removeGenre(chatId, userquery);
+      User.removeGenre(chatId, userquery,'dec callback');
       pingArg(chatId, { text: suggetion });
     } else {
       User.addGenre(chatId, userquery);
@@ -288,8 +281,15 @@ export const listenCallback=(query)=>{
       bot.sendMessage(chatId, `Ok, You will be notified for ${userquery}`);
       // Delete the message
       let delind = messageIds.findIndex((it) => it.key === suggetion);
-      if (delind > 0) bot.deleteMessage(chatId, messageIds[delind].messageId);
+      if (delind > 0) bot.deleteMessage(messageIds[delind].chatId, messageIds[delind].messageId);
     }
+  }
+  if (query.data.startsWith("delete_")) {
+    const itemToDelete = query.data.split("_")[1];
+    const chatId = query.message.chat.id;
+    User.removeGenre(chatId, itemToDelete,'rm command');
+    bot.sendMessage(chatId, `${itemToDelete} deleted successfully! ✅✅✅`);
+    // //  console.log("Delete item at index:", index);
   }
 }
 

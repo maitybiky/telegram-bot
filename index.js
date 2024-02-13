@@ -56,7 +56,7 @@ async function init() {
               bot
                 .sendPhoto(key, event.src, { caption, parse_mode: "HTML" })
                 .then(() => {
-                  User.removeGenre(key, eveName);
+                  User.removeGenre(key, eveName,'cron');
                 });
             } else {
               if (dndStatus) return;
@@ -76,7 +76,7 @@ async function init() {
                   one_time_keyboard: true,
                 },
               }).then((sentMsg)=>{
-                messageIds.push({ messageId:sentMsg.message_id, key: event.value });
+                messageIds.push({ messageId:sentMsg.message_id, key: event.value ,chatId:key});
               })
             }
           });

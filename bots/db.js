@@ -59,9 +59,11 @@ class UserChoices {
       //  console.error("Error occurred:", err);
     });
   }
-  removeGenre(userId, choiceToRemove) {
-    //  console.log('bv', choiceToRemove)
-    this.db.sRem(`db:${userId}`, choiceToRemove);
+  removeGenre(userId, choiceToRemove,from='unknown') {
+    this.db.sRem(`db:${userId}`, choiceToRemove).then(()=>{
+      console.log('delete genre', choiceToRemove , ' - ',from)
+
+    })
     this.remDnd(userId,choiceToRemove);
   }
 
