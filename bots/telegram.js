@@ -26,7 +26,7 @@ export const handleRequest = async (msg) => {
         first_name: msg.from.first_name,
         last_name: msg.from.last_name,
         text: msg.text,
-        time: moment().subtract(5.5,'hours').format("lll"),
+        time: moment().format("lll"),
       };
       addAnalytics(userData);
     }
