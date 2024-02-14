@@ -280,7 +280,7 @@ export const listenCallback = (query) => {
       User.adDnd(chatId, userquery);
       bot.sendMessage(chatId, `Ok, You will be notified for ${userquery}`);
       // Delete the message
-   
+      
       if (delind >= 0)
         bot.deleteMessage(
           messageIds[delind].chatId,
