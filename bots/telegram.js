@@ -20,7 +20,7 @@ export const handleRequest = async (msg) => {
     return;
   }
   if (msg.text !== an) {
-    if (!["/ls", "/now", "/rm", "/help"].includes(command)) {
+    if (!["/ls", "/now", "/rm", "/help", "/ping"].includes(command)) {
       let userData = {
         first_name: msg.from.first_name,
         last_name: msg.from.last_name,
@@ -51,11 +51,6 @@ export const handleRequest = async (msg) => {
     //  console.log("err", err);
   });
 
-  if (command !== "/start" && command !== "/ping" && command !== "/now") {
-    setTimeout(() => {
-      sendCommand(chatId);
-    }, 2000);
-  }
   if (["/start", "/help", "/now", "/ls", "/rm"].some((it) => it === command)) {
     if (pingResFlag.has(chatId)) {
       pingResFlag.del(chatId);
@@ -65,6 +60,9 @@ export const handleRequest = async (msg) => {
     start(chatId);
   } else if (command === "/help") {
     help(chatId);
+    setTimeout(() => {
+      sendCommand(chatId);
+    }, 2000);
   } else if (command === "/now") {
     now(chatId);
   } else if (command === "/ping") {
@@ -169,25 +167,79 @@ function getEvents(chatId, msg, command, head = true) {
   if (head) {
     bot.sendMessage(chatId, "Cool you are interested In " + msg.text);
   }
-  let filterGenre;
-  if (msg.text === "All Events") {
-    filterGenre = envEvent.events;
+
+  sendEventsPage(chatId, 1, command);
+}
+
+function sendEventsPage(chatId, page, command) {
+  let photoUrls = [];
+  if (command === "all events") {
+    photoUrls = envEvent.events;
   } else {
-    filterGenre = envEvent.events.filter((it) => {
+    photoUrls = envEvent.events.filter((it) => {
       return command.includes(it.genre.toLowerCase());
     });
   }
-  if (filterGenre.length === 0) {
-    bot.sendMessage(chatId, "No events Found currently 🙆🙆🙆");
+  if (photoUrls.length === 0) {
+    return bot.sendMessage(chatId, "No events Found currently 🙆🙆🙆");
   }
-  filterGenre.forEach((image) => {
-    let price = getPrice(image.ariaLabel);
-    const caption = `<a href="${image.href}">${image.ariaLabel}</a>
-    <strong style="color:#4aff4a">₹ ${price}</strong>          
-              `;
-    // //  console.log("caption", caption);
-    bot.sendPhoto(chatId, image.src, { caption, parse_mode: "HTML" });
-  });
+
+  const pageSize = 2;
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, photoUrls.length);
+
+  const currentPageUrls = photoUrls.slice(startIndex, endIndex);
+
+  let keyboard = [];
+  console.log("Page:", page);
+  console.log("End Index:", endIndex);
+  console.log("Total Photo URLs:", photoUrls.length);
+  if (page > 1) {
+    keyboard.push([
+      {
+        text: "Previous",
+        callback_data: `prev_${page - 1}_${command}_${chatId}`,
+      },
+    ]);
+  }
+  if (endIndex < photoUrls.length) {
+    keyboard.push([
+      { text: "Next", callback_data: `next_${page + 1}_${command}_${chatId}` },
+    ]);
+  }
+  console.log("keyboard:", keyboard);
+
+  bot
+    .sendMediaGroup(
+      chatId,
+      currentPageUrls.map((image) => ({
+        type: "photo",
+        media: image.src,
+        caption: `<a href="${image.href}">${
+          image.ariaLabel
+        }</a>\n<strong style="color:#4aff4a">₹ ${getPrice(
+          image.ariaLabel
+        )}</strong>`,
+        parse_mode: "HTML",
+      }))
+    )
+    .then((response) => {
+      const messageIds = response.map(
+        (mediaMessage) => mediaMessage.message_id
+      );
+      for (let i = 0; i < keyboard.length; i++) {
+        for (let j = 0; j < keyboard[i].length; j++) {
+          keyboard[i][j].callback_data =
+            keyboard[i][j].callback_data + `_${messageIds.join("^")}`;
+        }
+      }
+      console.log("Message IDs:", messageIds);
+      bot.sendMessage(chatId, "------------", {
+        reply_markup: {
+          inline_keyboard: keyboard,
+        },
+      });
+    });
 }
 
 async function pingArg(chatId, msg) {
@@ -280,7 +332,9 @@ export const listenCallback = (query) => {
       User.adDnd(chatId, userquery);
       bot.sendMessage(chatId, `Ok, You will be notified for ${userquery}`);
       // Delete the message
-      
+
+      let delind = messageIds.findIndex((it) => it.key === suggetion);
+
       if (delind >= 0)
         bot.deleteMessage(
           messageIds[delind].chatId,
@@ -295,6 +349,18 @@ export const listenCallback = (query) => {
     bot.sendMessage(chatId, `${itemToDelete} deleted successfully! ✅✅✅`);
     // //  console.log("Delete item at index:", index);
   }
+  const [action, value, command, chatId, prevmsgs] = query.data.split("_");
+  const messageIds = prevmsgs.split("^");
+  if (action === "next" || action === "prev") {
+    const page = parseInt(value);
+    sendEventsPage(chatId, page, command).then(() => {
+      messageIds.forEach((messageId) => {
+        bot.deleteMessage(chatId, messageId);
+      });
+    });
+  }
+
+  bot.answerCallbackQuery(query.id);
 };
 
 export { getEvents, sendCommand, pingArg };
