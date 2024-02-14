@@ -158,7 +158,11 @@ function now(chatId) {
 
 async function ping(chatId) {
   bot.sendMessage(chatId, "Enter your Artist Name or Event name :").then(() => {
-    bot.sendMessage(chatId, "To get notified in future...");
+    bot.sendMessage(chatId, "To get notified in future..."),{
+      reply_markup:{
+        remove_keyboard:true
+      }
+    };
   });
   await pingResFlag.set(chatId, 1);
 }
