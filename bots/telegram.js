@@ -5,7 +5,7 @@ import fs from "fs";
 import { User, addAnalytics, envEvent, pingResFlag } from "./db.js";
 import { GENRE } from "./genre.js";
 export const messageIds = [];
-
+const msgIdsmap=new Map()
 export const handleRequest = async (msg) => {
   const chatId = msg.chat.id;
   const command = msg.text.toLowerCase();
@@ -184,62 +184,67 @@ function sendEventsPage(chatId, page, command) {
     return bot.sendMessage(chatId, "No events Found currently 🙆🙆🙆");
   }
 
-  const pageSize = 2;
+  const pageSize = 4;
   const startIndex = (page - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, photoUrls.length);
 
   const currentPageUrls = photoUrls.slice(startIndex, endIndex);
 
   let keyboard = [];
-  console.log("Page:", page);
-  console.log("End Index:", endIndex);
-  console.log("Total Photo URLs:", photoUrls.length);
+  
   if (page > 1) {
-    keyboard.push([
+    keyboard.push(
       {
         text: "Previous",
         callback_data: `prev_${page - 1}_${command}_${chatId}`,
       },
-    ]);
+    );
   }
   if (endIndex < photoUrls.length) {
-    keyboard.push([
-      { text: "Next", callback_data: `next_${page + 1}_${command}_${chatId}` },
-    ]);
+    keyboard.push(
+      { text: "Next", callback_data: `next_${page + 1}_${command}_${chatId}` }
+    );
   }
-  console.log("keyboard:", keyboard);
+  // console.log("keyboard:", keyboard);
 
-  bot
-    .sendMediaGroup(
-      chatId,
-      currentPageUrls.map((image) => ({
-        type: "photo",
-        media: image.src,
-        caption: `<a href="${image.href}">${
-          image.ariaLabel
-        }</a>\n<strong style="color:#4aff4a">₹ ${getPrice(
-          image.ariaLabel
-        )}</strong>`,
-        parse_mode: "HTML",
-      }))
-    )
-    .then((response) => {
-      const messageIds = response.map(
-        (mediaMessage) => mediaMessage.message_id
-      );
-      for (let i = 0; i < keyboard.length; i++) {
-        for (let j = 0; j < keyboard[i].length; j++) {
-          keyboard[i][j].callback_data =
-            keyboard[i][j].callback_data + `_${messageIds.join("^")}`;
-        }
-      }
-      console.log("Message IDs:", messageIds);
-      bot.sendMessage(chatId, "------------", {
-        reply_markup: {
-          inline_keyboard: keyboard,
-        },
-      });
-    });
+  return new Promise((res, rej) => {
+    bot
+      .sendMediaGroup(
+        chatId,
+        currentPageUrls.map((image) => ({
+          type: "photo",
+          media: image.src,
+          caption: `<a href="${image.href}">${
+            image.ariaLabel
+          }</a>\n<strong style="color:#4aff4a">₹ ${getPrice(
+            image.ariaLabel
+          )}</strong>`,
+          parse_mode: "HTML",
+          
+        }))
+      )
+      .then((response) => {
+        const messageIds = response.map(
+          (mediaMessage) => mediaMessage.message_id
+        );
+        msgIdsmap.set(chatId,messageIds)
+      
+        console.log("Message IDs:", messageIds);
+        bot.sendMessage(chatId, "Tap on images to see more..", {
+          reply_markup: {
+            inline_keyboard: [keyboard],
+          },
+        }).then(sentmsg=>{
+         let prev= msgIdsmap.get(chatId)??[]
+         prev.push(sentmsg.message_id)
+         msgIdsmap.delete(chatId)
+         msgIdsmap.set(chatId,prev)
+        
+        })
+        res();
+      })
+      .catch(() => rej());
+  });
 }
 
 async function pingArg(chatId, msg) {
@@ -316,6 +321,7 @@ async function pingArg(chatId, msg) {
 }
 
 export const listenCallback = (query) => {
+  console.log("query", query);
   if (query.data.startsWith("dec_")) {
     const shouldDelete = query.data.split("_")[1];
     const suggetion = query.data.split("_")[2];
@@ -347,20 +353,28 @@ export const listenCallback = (query) => {
     const chatId = query.message.chat.id;
     User.removeGenre(chatId, itemToDelete);
     bot.sendMessage(chatId, `${itemToDelete} deleted successfully! ✅✅✅`);
-    // //  console.log("Delete item at index:", index);
+   
   }
-  const [action, value, command, chatId, prevmsgs] = query.data.split("_");
-  const messageIds = prevmsgs.split("^");
+  const [action, value, command, chatIdValue] = query.data.split("_");
+ 
+  const chatId = parseInt(chatIdValue);
+ 
+
   if (action === "next" || action === "prev") {
     const page = parseInt(value);
-    sendEventsPage(chatId, page, command).then(() => {
-      messageIds.forEach((messageId) => {
-        bot.deleteMessage(chatId, messageId);
-      });
+
+    Promise.all(
+      msgIdsmap.get(chatId).map((messageId) => {
+        return bot.deleteMessage(chatId, parseInt(messageId));
+      })
+    ).then(() => {
+      msgIdsmap.delete(chatId)
+      sendEventsPage(chatId, page, command);
+      bot.answerCallbackQuery(query.id);
     });
   }
 
-  bot.answerCallbackQuery(query.id);
+  
 };
 
 export { getEvents, sendCommand, pingArg };

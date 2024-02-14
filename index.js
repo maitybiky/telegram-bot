@@ -62,30 +62,37 @@ async function init() {
               if (dndStatus) return;
               const price = getPrice(event.event.event.ariaLabel);
               const caption = `🫤🫤Partial Match Found \n\n[${event.event.query}] -> [${event.value}]\n\n<a href="${event.event.event.href}">${event.event.event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>\n Is this  what you're looking for?`;
-              // //  console.log("caption", caption);
-              bot.sendPhoto(key, event.event.event.src, {
-                caption,
-                parse_mode: "HTML",
-                reply_markup: {
-                  inline_keyboard: ["Yes", "No"].map((item, index) => [
-                    {
-                      text: `${item}`,
-                      callback_data: `dec_${item}_${event.value}_${event.event.query}_${key}`,
-                    },
-                  ]),
-                  one_time_keyboard: true,
-                },
-              }).then((sentMsg)=>{
-                messageIds.push({ messageId:sentMsg.message_id, key: event.value ,chatId:key});
-               
-              })
+              
+              bot
+                .sendPhoto(key, event.event.event.src, {
+                  caption,
+                  parse_mode: "HTML",
+                  reply_markup: {
+                    inline_keyboard: ["Yes", "No"].map((item, index) => [
+                      {
+                        text: `${item}`,
+                        callback_data: `dec_${item}_${event.value}_${event.event.query}_${key}`,
+                      },
+                    ]),
+                    one_time_keyboard: true,
+                  },
+                })
+                .then((sentMsg) => {
+                  messageIds.push({
+                    messageId: sentMsg.message_id,
+                    key: event.value,
+                    chatId: key,
+                  });
+                });
             }
           });
         }
       });
     });
   } catch (error) {
-    console.log("error", error);
+    setTimeout(() => {
+      init();
+    }, 300 * 1000);
   }
 }
 init();
