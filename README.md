@@ -12,7 +12,7 @@ LINK=https://insider.in/all-events-in-kolkata \
 GENRE_CLASSNAME=css-1fv8emw \
 TG_BOT_TOKEN=<Your Telegram Token> \
 CRON_INTERVAL="0 */4 \_ \* \*" \
-PASSWORD=biky1234xx@ \
+PASSWORD=admin_password \
 REDIS_HOST=redis \
 REDIS_PORT=6379
 
