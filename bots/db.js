@@ -59,9 +59,8 @@ class UserChoices {
       //  console.error("Error occurred:", err);
     });
   }
-  removeGenre(userId, choiceToRemove,from='unknown') {
+  removeGenre(userId, choiceToRemove) {
     this.db.sRem(`db:${userId}`, choiceToRemove).then(()=>{
-      console.log('delete genre', choiceToRemove , ' - ',from)
 
     })
     this.remDnd(userId,choiceToRemove);
@@ -126,7 +125,7 @@ class pingFag {
   set(key, value) {
     return new Promise((resolve, reject) => {
       this.pingClient
-        .set(`${key}`, value ? 1 : 0,{ EX: 15 })
+        .set(`${key}`, value ? 1 : 0,{ EX: 90 })
         .then(() => {
           resolve();
         })

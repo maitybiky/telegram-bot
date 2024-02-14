@@ -2,12 +2,7 @@ import moment from "moment";
 import { bot, getPrice } from "../index.js";
 import { checkEvent } from "./Fuzzy.js";
 import fs from "fs";
-import {
-  User,
-  addAnalytics,
-  envEvent,
-  pingResFlag,
-} from "./db.js";
+import { User, addAnalytics, envEvent, pingResFlag } from "./db.js";
 import { GENRE } from "./genre.js";
 export const messageIds = [];
 
@@ -61,6 +56,11 @@ export const handleRequest = async (msg) => {
       sendCommand(chatId);
     }, 2000);
   }
+  if (["/start", "/help", "/now", "/ls", "/rm"].some((it) => it === command)) {
+    if (pingResFlag.has(chatId)) {
+      pingResFlag.del(chatId);
+    }
+  }
   if (command === "/start") {
     start(chatId);
   } else if (command === "/help") {
@@ -99,9 +99,7 @@ async function sendDeleteList(chatId) {
 
   bot.sendMessage(chatId, "Tap to Delete", options);
 
-  bot.on("callback_query", (query) => {
-    
-  });
+  bot.on("callback_query", (query) => {});
 }
 
 async function sendLs(chatId) {
@@ -158,11 +156,11 @@ function now(chatId) {
 
 async function ping(chatId) {
   bot.sendMessage(chatId, "Enter your Artist Name or Event name :").then(() => {
-    bot.sendMessage(chatId, "To get notified in future..."),{
-      reply_markup:{
-        remove_keyboard:true
-      }
-    };
+    bot.sendMessage(chatId, "To get notified in future...", {
+      reply_markup: {
+        remove_keyboard: true,
+      },
+    });
   });
   await pingResFlag.set(chatId, 1);
 }
@@ -237,7 +235,7 @@ async function pingArg(chatId, msg) {
               .then((sentMessage) => {
                 // Store the message ID for later deletion if necessary
                 const messageId = sentMessage.message_id;
-                messageIds.push({ messageId, key: event.value,chatId });
+                messageIds.push({ messageId, key: event.value, chatId });
               })
               .catch((error) => {
                 //  console.error("Error sending message:", error);
@@ -247,9 +245,9 @@ async function pingArg(chatId, msg) {
             const price = getPrice(event.ariaLabel);
             const caption = `✅Exact Match 🎉🎉🎉\n[${query}]\n\n<a href="${event.href}">${event.ariaLabel}</a>\n<strong style="color:#4aff4a">₹ ${price}</strong>          
         \n\n`;
-         
+
             bot.sendPhoto(chatId, event.src, { caption, parse_mode: "HTML" });
-            User.removeGenre(chatId, query,'ping');
+            User.removeGenre(chatId, query);
             sendCommand(chatId);
           }
         });
@@ -265,9 +263,7 @@ async function pingArg(chatId, msg) {
   }
 }
 
-
-
-export const listenCallback=(query)=>{
+export const listenCallback = (query) => {
   if (query.data.startsWith("dec_")) {
     const shouldDelete = query.data.split("_")[1];
     const suggetion = query.data.split("_")[2];
@@ -277,24 +273,28 @@ export const listenCallback=(query)=>{
     if (shouldDelete === "Yes") {
       bot.sendMessage(chatId, `Great 🎉🎉🎉`);
       pingResFlag.set(chatId, 0);
-      User.removeGenre(chatId, userquery,'dec callback');
+      User.removeGenre(chatId, userquery);
       pingArg(chatId, { text: suggetion });
     } else {
       User.addGenre(chatId, userquery);
       User.adDnd(chatId, userquery);
       bot.sendMessage(chatId, `Ok, You will be notified for ${userquery}`);
       // Delete the message
-      let delind = messageIds.findIndex((it) => it.key === suggetion);
-      if (delind > 0) bot.deleteMessage(messageIds[delind].chatId, messageIds[delind].messageId);
+   
+      if (delind >= 0)
+        bot.deleteMessage(
+          messageIds[delind].chatId,
+          messageIds[delind].messageId
+        );
     }
   }
   if (query.data.startsWith("delete_")) {
     const itemToDelete = query.data.split("_")[1];
     const chatId = query.message.chat.id;
-    User.removeGenre(chatId, itemToDelete,'rm command');
+    User.removeGenre(chatId, itemToDelete);
     bot.sendMessage(chatId, `${itemToDelete} deleted successfully! ✅✅✅`);
     // //  console.log("Delete item at index:", index);
   }
-}
+};
 
 export { getEvents, sendCommand, pingArg };

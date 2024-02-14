@@ -1,7 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 import cron from "node-cron";
-import { handleRequest, listenCallback, messageIds, pingArg } from "./bots/telegram.js";
+import { handleRequest, listenCallback, messageIds } from "./bots/telegram.js";
 import { User, envEvent } from "./bots/db.js";
 import { upcomingEvents } from "./bots/crawler.js";
 import { checkEvent } from "./bots/Fuzzy.js";
@@ -56,7 +56,7 @@ async function init() {
               bot
                 .sendPhoto(key, event.src, { caption, parse_mode: "HTML" })
                 .then(() => {
-                  User.removeGenre(key, eveName,'cron');
+                  User.removeGenre(key, eveName);
                 });
             } else {
               if (dndStatus) return;
