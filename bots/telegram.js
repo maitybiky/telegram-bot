@@ -6,6 +6,7 @@ import { User, addAnalytics, envEvent, pingResFlag } from "./db.js";
 import { GENRE } from "./genre.js";
 export const messageIds = [];
 const msgIdsmap=new Map()
+
 export const handleRequest = async (msg) => {
   const chatId = msg.chat.id;
   const command = msg.text.toLowerCase();
@@ -25,7 +26,7 @@ export const handleRequest = async (msg) => {
         first_name: msg.from.first_name,
         last_name: msg.from.last_name,
         text: msg.text,
-        time: moment().format("lll"),
+        time: moment().subtract(5.5,'hours').format("lll"),
       };
       addAnalytics(userData);
     }
@@ -229,7 +230,7 @@ function sendEventsPage(chatId, page, command) {
         );
         msgIdsmap.set(chatId,messageIds)
       
-        console.log("Message IDs:", messageIds);
+        
         bot.sendMessage(chatId, "Tap on images to see more..", {
           reply_markup: {
             inline_keyboard: [keyboard],
@@ -321,7 +322,7 @@ async function pingArg(chatId, msg) {
 }
 
 export const listenCallback = (query) => {
-  console.log("query", query);
+
   if (query.data.startsWith("dec_")) {
     const shouldDelete = query.data.split("_")[1];
     const suggetion = query.data.split("_")[2];
