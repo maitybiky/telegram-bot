@@ -19,7 +19,7 @@ class UserChoices {
       await this.db.connect();
       this.db.on("error", (err) => console.log("db Client Error", err));
     } catch (error) {
-      //  console.error("Error initializing UserChoices:", error);
+       console.error("Error initializing UserChoices:", error);
     }
   }
   adDnd(chatId, choice) {
@@ -27,7 +27,7 @@ class UserChoices {
       .set(`dnd:${chatId}:${choice}`, "1", { EX: 7 * 24 * 60 * 60 })
       .catch((err) => {
         // Handling errors
-        //  console.error("Error occurred:", err);
+         console.error("Error occurred:", err);
       });
   }
   hasDnd(chatId, choice) {
@@ -39,7 +39,7 @@ class UserChoices {
           resolve(data);
         })
         .catch(() => {
-          //  console.log("has err", err);
+           console.log("has err", err);
 
           reject();
         });
@@ -50,7 +50,7 @@ class UserChoices {
       .del(`dnd:${chatId}:${choice}`)
 
       .catch((err) => {
-        //  console.log("del err", err);
+         console.log("del err", err);
       });
   }
   addGenre(userId, choice) {
@@ -117,11 +117,16 @@ class pingFag {
     this.init();
   }
   async init() {
-    this.pingClient = redis.createClient(redisConfig);
-    await this.pingClient.connect();
-    this.pingClient.on("error", (err) =>
-      console.log("ping flag Client Error", err)
-    );
+    try {
+      this.pingClient = redis.createClient(redisConfig);
+      await this.pingClient.connect();
+      this.pingClient.on("error", (err) =>
+        console.log("ping flag Client Error", err)
+      );
+    } catch (error) {
+      console.log('ping flag error',error)
+    }
+ 
   }
   set(key, value) {
     return new Promise((resolve, reject) => {
