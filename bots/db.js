@@ -6,7 +6,7 @@ const redisConfig = {
   port: process.env.REDIS_PORT,
   password:process.env.REDIS_PASS
 };
- console.log("redisConfig", redisConfig);
+ console.log("redisConfig with pass", redisConfig);
 class UserChoices {
   constructor() {
     this.initialize();
