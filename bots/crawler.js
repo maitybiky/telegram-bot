@@ -78,7 +78,7 @@ const getEvents = async (page) => {
       resolve(eventCardData);
     } catch (error) {
       //  console.log("error", error);
-      reject(null);
+      reject(error);
     }
   });
 };

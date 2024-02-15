@@ -90,6 +90,7 @@ async function init() {
       });
     });
   } catch (error) {
+    console.log('error', error)
     setTimeout(() => {
       init();
     }, 300 * 1000);
