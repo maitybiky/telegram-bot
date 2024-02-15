@@ -4,6 +4,7 @@ const redisConfig = {
   // host: '172.19.0.2',
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT,
+  password:process.env.REDIS_PASS
 };
  console.log("redisConfig", redisConfig);
 class UserChoices {
